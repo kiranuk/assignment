@@ -1,17 +1,24 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.testing import db
 
-from db.models.products import Product, Wine
+from db.models.products import Product, Wine, WineNutritionalInfo
 from schemas.products import WineUpdate
 
 
 def create_wine(db, wine):
     product_data = wine.dict().pop('product', [])
-    wine_data = wine.dict(exclude={'product'})
+    nutritional_info = wine.dict().pop('nutritional_info', {})
+    wine_data = wine.dict(exclude={'product', 'nutritional_info'})
     wine = Wine(**wine_data)
     db.add(wine)
     db.commit()
     db.refresh(wine)
+    nutritional_info = WineNutritionalInfo(**nutritional_info)
+    nutritional_info.wine = wine
+    nutritional_info.wine_id = wine.id
+    db.add(nutritional_info)
+    db.commit()
+    db.refresh(nutritional_info)
     # Create Product objects associated with the wine
     for product_dict in product_data:
         product = Product(**product_dict)

@@ -22,7 +22,6 @@ class Wine(Base):
     wine_type = Column(String, nullable=True)
     wine_color = Column(String, nullable=True)
     ingredients = Column(String, nullable=True)
-    nutritional_info = Column(String, nullable=True)
     sweetness = Column(Integer, nullable=True)
     acidity = Column(Integer, nullable=True)
     tannin = Column(Integer, nullable=True)
@@ -41,6 +40,41 @@ class Wine(Base):
     yield_in_hector = Column(Float, nullable=True)
     products = relationship("Product", back_populates="wine")
     documents = relationship("WineDocument", back_populates="wine")
+    nutritional_info = relationship(
+        "WineNutritionalInfo", back_populates="wine", uselist=False,)
+
+
+class WineNutritionalInfo(Base):
+
+    __tablename__ = 'wine_nutritional_info'
+    id = Column(Integer, primary_key=True)
+    wine_id = Column(
+        Integer, ForeignKey('wines.id'), unique=True)
+    wine = relationship(
+        "Wine", back_populates="nutritional_info")
+    total_fat = Column(Float, nullable=True, default=0.0)
+    saturated_fat = Column(Float, nullable=True, default=0.0)
+    trans_fat = Column(Float, nullable=True, default=0.0)
+    polyunsaturated_fat = Column(Float, nullable=True, default=0.0)
+    monounsaturated_fat = Column(Float, nullable=True, default=0.0)
+    cholesterol = Column(Float, nullable=True, default=0.0)
+    salt = Column(Float, nullable=True, default=0.0)
+    total_carbohydrates = Column(Float, nullable=True, default=0.0)
+    dietary_fiber = Column(Float, nullable=True, default=0.0)
+    sugars = Column(Float, nullable=True, default=0.0)
+    added_sugars = Column(Float, nullable=True, default=0.0)
+    sugar_alcohols = Column(Float, nullable=True, default=0.0)
+    protein = Column(Float, nullable=True, default=0.0)
+    # vitamins
+    vitamin_units = Column(String, nullable=True, default="")
+    vitamin_a = Column(Float, nullable=True, default=0.0)
+    vitamin_c = Column(Float, nullable=True, default=0.0)
+    vitamin_d = Column(Float, nullable=True, default=0.0)
+    vitamin_e = Column(Float, nullable=True, default=0.0)
+    vitamin_k = Column(Float, nullable=True, default=0.0)
+    calcium = Column(Float, nullable=True, default=0.0)
+    iron = Column(Float, nullable=True, default=0.0)
+    potassium = Column(Float, nullable=True, default=0.0)
 
 
 class Product(Base):

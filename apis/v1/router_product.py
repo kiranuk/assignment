@@ -14,7 +14,7 @@ from db.session import get_db
 router = APIRouter()
 
 
-@router.post("/")
+@router.post("/", response_model=WineOutDBBase)
 def create_wine_router(wine: WineCreate, db: Session = Depends(get_db)):
     wine = create_wine(db, wine)
     return wine
@@ -22,18 +22,19 @@ def create_wine_router(wine: WineCreate, db: Session = Depends(get_db)):
 
 @router.get("/", response_model=List[WineOutDBBase])
 def get_wines(db: Session = Depends(get_db)):
-    wines = db.query(Wine).options(joinedload(Wine.products)).all()
+    wines = db.query(Wine).options(
+        joinedload(Wine.products), joinedload(Wine.nutritional_info)).all()
     return wines
 
 
 # get the product details with id
-@router.get("/{id}")
+@router.get("/{id}", response_model=WineOutDBBase)
 def get_wine(id: int, db: Session = Depends(get_db)):
     product = db.query(Wine).filter(Wine.id == id).first()
     return product
 
 
-@router.patch("/{id}")
+@router.patch("/{id}", response_model=WineOutDBBase)
 def update_wine_details(
         id: int, wine_update: WineUpdate, db: Session = Depends(get_db)):
     wine = db.query(Wine).filter(Wine.id == id).first()

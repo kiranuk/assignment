@@ -1,6 +1,6 @@
-from typing import Optional, List
+from typing import Optional, List, Dict, Union
 
-from pydantic import BaseModel,EmailStr, Field
+from pydantic import BaseModel
 
 
 class ProductCreate(BaseModel):
@@ -17,6 +17,39 @@ class ProductOutDBBase(BaseModel):
         orm_mode = True
 
 
+class NutritionalCreate(BaseModel):
+
+    total_fat: Optional[int]
+    saturated_fat: Optional[int]
+    trans_fat: Optional[int]
+    polyunsaturated_fat: Optional[int]
+    monounsaturated_fat: Optional[int]
+    cholesterol: Optional[int]
+    salt: Optional[int]
+    total_carbohydrates: Optional[int]
+    dietary_fiber: Optional[int]
+    sugars: Optional[int]
+    added_sugars: Optional[int]
+    sugar_alcohols: Optional[int]
+    protein: Optional[int]
+    vitamin_units: Optional[str]
+    vitamin_a: Optional[int]
+    vitamin_c: Optional[int]
+    vitamin_d: Optional[int]
+    vitamin_e: Optional[int]
+    vitamin_k: Optional[int]
+    calcium: Optional[int]
+    iron: Optional[int]
+    potassium: Optional[int]
+
+    class Config:
+        orm_mode = True
+
+
+class NutritionalInfo(NutritionalCreate):
+    id: int
+
+
 class WineCreate(BaseModel):
     name: str
     description: str
@@ -29,7 +62,6 @@ class WineCreate(BaseModel):
     wine_type: Optional[str]
     wine_color: Optional[str]
     ingredients: Optional[str]
-    nutritional_info: Optional[str]
     sweetness: Optional[int]
     acidity: Optional[int]
     tannin: Optional[int]
@@ -47,6 +79,10 @@ class WineCreate(BaseModel):
     altitude: Optional[str]
     yield_in_hector: Optional[float]
     product: List[ProductCreate]
+    nutritional_info: NutritionalCreate
+
+    class Config:
+        orm_mode = True
 
 
 class WineUpdate(BaseModel):
@@ -67,7 +103,6 @@ class WineOutDBBase(BaseModel):
     wine_type: Optional[str]
     wine_color: Optional[str]
     ingredients: Optional[str]
-    nutritional_info: Optional[str]
     sweetness: Optional[int]
     acidity: Optional[int]
     tannin: Optional[int]
@@ -84,7 +119,8 @@ class WineOutDBBase(BaseModel):
     vinyard_name: Optional[str]
     altitude: Optional[str]
     yield_in_hector: Optional[float]
-    products: List[ProductOutDBBase] = []
+    products: Optional[List] = []
+    nutritional_info: NutritionalInfo
 
     class Config:
         orm_mode = True
