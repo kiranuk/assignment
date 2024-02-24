@@ -1,57 +1,54 @@
 from http.client import HTTPException
+from typing import List
 
 from fastapi import APIRouter
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from fastapi import Depends
 from sqlalchemy.orm.exc import UnmappedInstanceError
 
-from db.models.products import Product
-from db.repository.products import update_product
-from schemas.products import ProductCreate, ProductUpdate
+from db.models.products import Wine
+from db.repository.wines import update_wine, create_wine
+from schemas.products import WineCreate, WineUpdate, WineOutDBBase
 from db.session import get_db
 
 router = APIRouter()
 
 
 @router.post("/")
-def create_product(product: ProductCreate, db: Session = Depends(get_db)):
-    product = Product(
-        name=product.name, description=product.description)
-    db.add(product)
-    db.commit()
-    db.refresh(product)
-    return product
+def create_wine_router(wine: WineCreate, db: Session = Depends(get_db)):
+    wine = create_wine(db, wine)
+    return wine
 
 
-@router.get("/list")
-def get_products(db: Session = Depends(get_db)):
-    products = db.query(Product).all()
-    return products
+@router.get("/", response_model=List[WineOutDBBase])
+def get_wines(db: Session = Depends(get_db)):
+    wines = db.query(Wine).options(joinedload(Wine.products)).all()
+    return wines
 
 
 # get the product details with id
 @router.get("/{id}")
-def get_product(id: int, db: Session = Depends(get_db)):
-    product = db.query(Product).filter(Product.id == id).first()
+def get_wine(id: int, db: Session = Depends(get_db)):
+    product = db.query(Wine).filter(Wine.id == id).first()
     return product
 
 
 @router.patch("/{id}")
-def update_product_details(
-        id: int, product_update: ProductUpdate, db: Session = Depends(get_db)):
-    product = db.query(Product).filter(Product.id == id).first()
-    if product is None:
+def update_wine_details(
+        id: int, wine_update: WineUpdate, db: Session = Depends(get_db)):
+    wine = db.query(Wine).filter(Wine.id == id).first()
+    if wine is None:
         raise HTTPException(status_code=404, detail="Product not found")
-    db_product = update_product(db, product, product_update)
+    db_product = update_wine(db, wine, wine_update)
     return db_product
 
 
 @router.delete("/{id}")
-def delete_product(id: int, db: Session = Depends(get_db)):
+def delete_wine(id: int, db: Session = Depends(get_db)):
     try:
-        product = db.query(Product).filter(Product.id == id).first()
+        wine = db.query(Wine).filter(Wine.id == id).first()
     except UnmappedInstanceError:
         raise HTTPException(status_code=400, detail="Product not found")
-    db.delete(product)
+    db.delete(wine)
     db.commit()
-    return {"message": "Product deleted successfully"}
+    return {"message": "Wine deleted successfully"}
