@@ -1,7 +1,8 @@
 from http.client import HTTPException
 from typing import List
 
-from fastapi import APIRouter
+from fastapi import APIRouter, UploadFile
+from fastapi.params import File
 from sqlalchemy.orm import Session, joinedload
 from fastapi import Depends
 from sqlalchemy.orm.exc import UnmappedInstanceError
@@ -53,3 +54,13 @@ def delete_wine(id: int, db: Session = Depends(get_db)):
     db.delete(wine)
     db.commit()
     return {"message": "Wine deleted successfully"}
+
+
+@router.patch("/{id}/image", response_model=WineOutDBBase)
+def update_wine_image(id: int, image: UploadFile = File(...), db: Session = Depends(get_db)):
+    wine = db.query(Wine).filter(Wine.id == id).first()
+    wine.image = wine.save_image_to_s3(image)
+    db.commit()
+    db.refresh(wine)
+    return wine
+

@@ -124,3 +124,13 @@ class WineOutDBBase(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class WineDocumentSchema(BaseModel):
+    id: int
+    wine_id: int
+    document: bytes
+    document_type: str
+
+    class Config:
+        orm_mode = True

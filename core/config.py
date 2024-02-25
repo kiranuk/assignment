@@ -1,4 +1,6 @@
 import os
+
+import boto3
 from dotenv import load_dotenv
 
 from pathlib import Path
@@ -18,5 +20,6 @@ class Settings:
     print(os.getenv("POSTGRES_USER"))
     print(POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_SERVER, POSTGRES_PORT, POSTGRES_DB, '>>>>>>>>>>>>>>>>>>>>>>>>')
     DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}:{POSTGRES_PORT}/{POSTGRES_DB}"
-
+    s3_client = boto3.client('s3', region_name='your-region', aws_access_key_id='your-access-key',
+                             aws_secret_access_key='your-secret-key')
 settings = Settings()
